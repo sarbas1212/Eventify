@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% block title %}Booking Estimate & Payment{% endblock %}
+{% block content %}
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<div class="max-w-3xl mx-auto px-4 py-10 mt-10 bg-gray-900/95 rounded-2xl shadow-2xl border border-gray-800">
+
+    <h2 class="text-3xl font-extrabold text-center text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-indigo-500 bg-clip-text mb-7">
+        Booking Estimate & Payment
+    </h2>
+
+    <!-- Summary -->
+    <div class="bg-gray-800/70 p-7 rounded-xl mb-8 shadow flex flex-col gap-3">
+        <div class="flex justify-between items-center">
+            <div class="font-bold text-lg text-pink-400">Invoice #: <span>{{ invoice_no }}</span></div>
+            <div class="font-semibold text-gray-300">
+                Date:
+                {% if sections.0.date %}
+                    {{ sections.0.date }}
+                {% else %}
+                    {{ current_date }}
+                {% endif %}
+            </div>
+        </div>
+        <div class="mt-2">
+            <div class="font-bold text-indigo-400">Customer: {{ customer_name }}</div>
+            <div class="text-gray-300">Phone: {{ phone }}</div>
+            {% if secondary_phone %}
+            <div class="text-gray-300">Secondary Phone: {{ secondary_phone }}</div>
+            {% endif %}
+            <div class="text-gray-300">Venue / Address: {{ venue }}</div>
+        </div>
+    </div>
+
+    <!-- Booking Sections -->
+    <div class="mb-7">
+        <div class="font-bold mb-2 text-pink-300">Booking Sections</div>
+        {% for s in sections %}
+        <div class="bg-gray-900/90 rounded border border-gray-700 p-4 mb-4">
+            <div class="font-bold text-xl text-purple-300">{{ s.service }} <span class="text-gray-200">| {{ s.service_type }}</span></div>
+            <div class="text-gray-400">Date/Time: {{ s.date }} {{ s.time }}</div>
+            <div class="text-pink-400 font-semibold">Budget: ₹{{ s.budget }}</div>
+            {% if s.notes %}
+            <div class="mt-2 text-gray-400 italic">{{ s.notes }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="text-right mt-2 font-bold text-2xl text-pink-500">
+            Total: ₹{{ total }}
+        </div>
+    </div>
+
+    <!-- Final Payment Form -->
+    <form id="payment-form" method="post" action="{% url 'payment:payment_finalize' %}">
+        {% csrf_token %}
+
+        <input type="hidden" name="invoice_no" value="{{ invoice_no }}">
+        <input type="hidden" name="customer_name" value="{{ customer_name }}">
+        <input type="hidden" name="phone" value="{{ phone }}">
+        <input type="hidden" name="secondary_phone" value="{{ secondary_phone }}">
+        <input type="hidden" name="venue" value="{{ venue }}">
+        <input type="hidden" name="total_amount" value="{{ total }}">
+
+        <!-- Razorpay Hidden Inputs -->
+        <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+        <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+        <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+
+        {% for s in sections %}
+        <input type="hidden" name="section_service" value="{{ s.service }}">
+        <input type="hidden" name="section_service_type" value="{{ s.service_type }}">
+        <input type="hidden" name="section_service_id" value="{{ s.service_id }}">
+        <input type="hidden" name="section_service_type_id" value="{{ s.service_type_id }}">
+        <input type="hidden" name="section_budget" value="{{ s.budget }}">
+        <input type="hidden" name="section_date" value="{{ s.date }}">
+        <input type="hidden" name="section_time" value="{{ s.time }}">
+        <input type="hidden" name="section_notes" value="{{ s.notes }}">
+        {% endfor %}
+
+        <!-- Payment Mode -->
+        <div class="my-5">
+            <label class="font-bold text-pink-400 mb-2 block">Choose Payment:</label>
+            <div class="flex gap-8 items-center">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="payment_mode" value="deposit" required>
+                    <span class="ml-2">Pay 10% Deposit (<span class="font-bold text-pink-400">₹{{ deposit_amount }}</span>)</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="payment_mode" value="full" required>
+                    <span class="ml-2">Pay Full (<span class="font-bold text-green-400">₹{{ total }}</span>)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Payment Type -->
+        <div class="my-5">
+            <label class="font-bold text-indigo-400 mb-2 block">Payment Type</label>
+            <select name="payment_type" required class="w-72 px-4 py-2 text-lg rounded-xl bg-gray-900 text-gray-100 border-2 border-indigo-400">
+                {% for pt in payment_types %}
+                <option value="{{ pt }}">{{ pt }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Button -->
+        <button type="button" id="rzp-button"
+            class="w-full mt-3 py-4 rounded-full font-extrabold text-white text-2xl bg-gradient-to-r from-green-600 via-blue-500 to-indigo-700 shadow-lg hover:scale-105">
+            Confirm & Make Payment
+        </button>
+    </form>
+</div>
+
+<script>
+document.getElementById("rzp-button").onclick = function (e) {
+    e.preventDefault();
+
+    const paymentMode = document.querySelector("input[name='payment_mode']:checked");
+    const paymentType = document.querySelector("select[name='payment_type']").value;
+
+    if (!paymentMode) {
+        alert("Please select a payment mode.");
+        return;
+    }
+
+    if (!paymentType) {
+        alert("Please select a payment type.");
+        return;
+    }
+
+    var options = {
+        "key": "{{ razorpay_key }}",
+        "amount": "{{ amount_in_paise }}",
+        "currency": "INR",
+        "name": "Event Booking",
+        "description": "Booking Payment",
+        "order_id": "{{ razorpay_order_id }}",
+
+        "handler": function (response) {
+            document.getElementById("razorpay_payment_id").value = response.razorpay_payment_id;
+            document.getElementById("razorpay_order_id").value = response.razorpay_order_id;
+            document.getElementById("razorpay_signature").value = response.razorpay_signature;
+
+            document.getElementById("payment-form").submit();
+        }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+};
+</script>
+
+{% endblock %}

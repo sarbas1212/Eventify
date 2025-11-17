@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-12 mt-12 bg-gray-900/98 rounded-3xl shadow-2xl border border-gray-800/60 relative">
+    <h2 class="text-4xl font-extrabold mb-8 text-center text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text tracking-tight drop-shadow-2xl">
+        Book Your Event
+    </h2>
+    <form method="post" id="booking-form" autocomplete="off">
+        {% csrf_token %}
+
+        <!-- CUSTOMER & EVENT DETAILS -->
+        <div class="bg-gray-800/60 rounded-2xl px-5 py-7 border border-gray-700/80 mb-8 shadow-sm flex flex-col gap-6">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="flex flex-col w-full sm:w-2/4">
+                    <label class="mb-1 text-base font-semibold text-pink-300">Customer Name</label>
+                    <input type="text" name="customer_name" required placeholder="Full Name"
+                        class="px-4 py-2 text-base rounded-xl bg-gray-900 text-gray-100 border-2 border-pink-400 focus:ring-2 focus:ring-pink-500">
+                </div>
+                <div class="flex flex-col w-full sm:w-2/4">
+                    <label class="mb-1 text-base font-semibold text-pink-300">Phone Number</label>
+                    <input type="tel" name="phone" required minlength="10" maxlength="15" pattern="[0-9+ ]*" placeholder="Primary Phone"
+                        class="px-4 py-2 text-base rounded-xl bg-gray-900 text-gray-100 border-2 border-pink-400 focus:ring-2 focus:ring-pink-500">
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="flex flex-col w-full sm:w-2/4">
+                    <label class="mb-1 text-base font-semibold text-purple-300">Secondary Phone</label>
+                    <input type="tel" name="secondary_phone" maxlength="15" pattern="[0-9+ ]*" placeholder="(Optional)"
+                        class="px-4 py-2 text-base rounded-xl bg-gray-900 text-gray-100 border-2 border-purple-400 focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div class="flex flex-col w-full sm:w-2/4">
+                    <label class="mb-1 text-base font-semibold text-indigo-300">Venue / Address</label>
+                    <input type="text" name="venue" required maxlength="255" placeholder="Event Address / Venue"
+                        class="px-4 py-2 text-base rounded-xl bg-gray-900 text-gray-100 border-2 border-indigo-400 focus:ring-2 focus:ring-indigo-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- MULTI-BOOKING SECTIONS -->
+        <div id="sections-container" class="flex flex-col gap-7">
+            <div class="booking-section bg-gray-800/85 rounded-2xl px-5 py-6 border border-gray-700/80 relative group shadow">
+                <!-- Category Row -->
+                <div class="flex gap-4 items-end mb-4">
+                    <div class="flex flex-col w-3/4">
+                        <label class="mb-1 text-base font-semibold text-pink-300 tracking-wide">Category</label>
+                        <select name="service_1" class="section-service px-4 py-2 text-base rounded-xl bg-gray-900 text-gray-100 border-2 border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-500">
+                            {% for srv in services %}
+                                <option value="{{ srv.id }}">{{ srv.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="flex items-center ml-auto mr-2">
+                        <button type="button" id="add-section"
+                                class="w-10 h-10 bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-white rounded-full text-2xl flex items-center justify-center shadow hover:scale-110 transition"
+                                title="Add Another Section" aria-label="Add section">+</button>
+                        <button type="button"
+                                class="remove-section hidden w-10 h-10 ml-2 bg-gradient-to-br from-red-600 to-pink-700 text-white rounded-full text-2xl flex items-center justify-center shadow hover:scale-110 transition"
+                                title="Remove This Section" aria-label="Remove section">–</button>
+                    </div>
+                </div>
+                <!-- Date & Time Row -->
+                <div class="flex gap-4 items-end mb-4">
+                    <div class="flex flex-col w-1/2">
+                        <label class="mb-1 text-sm font-semibold text-indigo-300 tracking-wide">Date</label>
+                        <input type="date" name="event_date_1"
+                               class="px-4 py-2 text-base rounded-xl bg-gray-900 text-gray-100 border-2 border-gray-700 focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="flex flex-col w-1/2">
+                        <label class="mb-1 text-sm font-semibold text-indigo-300 tracking-wide">Time</label>
+                        <input type="time" name="event_time_1"
+                               class="px-4 py-2 text-base rounded-xl bg-gray-900 text-gray-100 border-2 border-gray-700 focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <!-- Type & Budget Row -->
+                <div class="flex gap-4 items-end mb-4">
+                    <div class="flex flex-col w-3/4">
+                        <label class="mb-1 text-sm font-semibold text-purple-300 tracking-wide">Type</label>
+                        <select name="service_type_1" class="section-servicetype px-4 py-2 text-base rounded-l-xl bg-gray-900 text-gray-100 border-2 border-gray-700 border-r-0 focus:outline-none focus:ring-2 focus:ring-pink-500">
+                            <!-- JS will fill options -->
+                        </select>
+                    </div>
+                    <div class="flex flex-col w-1/4">
+                        <label class="mb-1 text-sm font-semibold text-pink-400 tracking-wide">Budget</label>
+                        <span class="budget-display px-4 py-2 text-base font-bold rounded-xl bg-gray-950 text-pink-400 border-2 border-pink-700 whitespace-nowrap transition h-[42px] flex items-center"></span>
+                    </div>
+                </div>
+                <!-- Notes Row -->
+                <div class="mt-2">
+                    <label class="mb-1 text-sm font-semibold text-purple-200 tracking-wide">Notes</label>
+                    <textarea name="notes_1" rows="2"
+                              class="w-full px-3 py-2 text-base rounded-xl bg-gray-900 text-gray-100 border-2 border-gray-700 resize-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                </div>
+            </div>
+        </div>
+        <!-- Total -->
+        <div class="w-full flex justify-end mt-10 mb-6 z-10">
+            <span class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900/90 border border-pink-600 text-2xl font-extrabold rounded-xl px-8 py-3 shadow-2xl text-pink-400 tracking-wide ring-2 ring-pink-900/10 flex items-center gap-3">
+                <i class="fa-solid fa-calculator text-pink-400"></i>
+                Total: ₹<span id="total-amount">0</span>
+            </span>
+        </div>
+        <button type="submit"
+                class="mt-2 w-full py-4 rounded-full font-extrabold text-white text-2xl bg-gradient-to-r from-pink-700 via-purple-700 to-indigo-700 shadow-lg hover:shadow-xl hover:scale-105 focus:ring-4 focus:ring-pink-700/40 animate-pulse flex items-center justify-center gap-3">
+            <i class="fa-solid fa-credit-card"></i>
+            Confrim Payment
+        </button>
+    </form>
+</div>
+
+<script>
+    const allServiceTypes = [
+        {% for st in service_types %}
+            {
+                id: "{{ st.id }}",
+                name: "{{ st.name }}",
+                service_id: "{{ st.service.id }}",
+                budget: "{{ st.budget|default:'0' }}"
+            }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    let sectionCount = 1;
+
+    function filterTypes(serviceSelect) {
+        var section = serviceSelect.closest('.booking-section');
+        var typeSelect = section.querySelector('.section-servicetype');
+        var categoryId = serviceSelect.value;
+        typeSelect.innerHTML = "";
+        allServiceTypes.filter(st => st.service_id == categoryId).forEach(st => {
+            var opt = document.createElement('option');
+            opt.value = st.id;
+            opt.textContent = st.name;
+            typeSelect.appendChild(opt);
+        });
+        updateBudgetsAndTotal();
+    }
+
+    function setupSection(section) {
+        var serviceSelect = section.querySelector('.section-service');
+        serviceSelect.onchange = function() { filterTypes(this); };
+        filterTypes(serviceSelect);
+
+        var typeSelect = section.querySelector('.section-servicetype');
+        typeSelect.onchange = updateBudgetsAndTotal;
+    }
+
+    function updateBudgetsAndTotal() {
+        let total = 0;
+        document.querySelectorAll('.booking-section').forEach(function(section) {
+            var typeSelect = section.querySelector('.section-servicetype');
+            var display = section.querySelector('.budget-display');
+            var serviceTypeId = typeSelect.value;
+            var st = allServiceTypes.find(st => st.id == serviceTypeId);
+            let budget = st ? parseFloat(st.budget) || 0 : 0;
+            display.textContent = "₹" + budget.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            total += budget;
+        });
+        document.getElementById('total-amount').textContent = total.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+    }
+
+    document.querySelectorAll('.booking-section').forEach(setupSection);
+
+    document.getElementById('add-section').addEventListener('click', function() {
+        sectionCount += 1;
+        var lastSection = document.querySelector('.booking-section:last-child');
+        var newSection = lastSection.cloneNode(true);
+
+        newSection.querySelectorAll('select, textarea, input').forEach(function(el) {
+            if (el.name) el.name = el.name.replace(/_\d+/, "_" + sectionCount);
+            if (el.id) el.id = el.id.replace(/_\d+/, "_" + sectionCount);
+            if (el.type === 'select-one' || el.type === 'date' || el.type === 'time' || el.type === 'textarea' || el.type === 'text') el.value = '';
+        });
+        newSection.querySelector('.remove-section').classList.remove('hidden');
+        newSection.querySelector('.remove-section').onclick = function() {
+            newSection.remove();
+            updateBudgetsAndTotal();
+        };
+        document.getElementById('sections-container').appendChild(newSection);
+        setupSection(newSection);
+        updateBudgetsAndTotal();
+    });
+
+    document.querySelectorAll('.remove-section').forEach(function(btn) {
+        btn.onclick = function() {
+            if(document.querySelectorAll('.booking-section').length > 1) {
+                btn.closest('.booking-section').remove();
+                updateBudgetsAndTotal();
+            }
+        };
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.booking-section').forEach(setupSection);
+        updateBudgetsAndTotal();
+    });
+</script>
+{% endblock %}

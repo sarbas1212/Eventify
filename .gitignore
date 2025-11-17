@@ -1,0 +1,14 @@
+virt/
+
+media/
+
+db.sqlite3
+
+credentials.txt
+
+__pycache__/
+
+
+
+
+event/git/

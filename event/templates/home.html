@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Hero Section with Dynamic Banner from HeroBanner model -->
+{% if banners %}
+  {% for banner in banners %}
+    {% if banner.is_active %}
+<section class="relative h-screen flex items-center justify-center overflow-hidden">
+  <!-- Background Image -->
+  <div class="absolute inset-0">
+    <img src="{{ banner.image.url }}" 
+         alt="{{ banner.title }}" 
+         class="w-full h-full object-cover brightness-75">
+  </div>
+
+
+ <!-- Hero Content -->
+<div class="relative z-10 text-center px-6">
+  <h1 class="text-5xl md:text-6xl font-extrabold text-purple-400 mb-4 drop-shadow-2xl">
+    {{ banner.title }}
+  </h1>
+  {% if banner.subtitle %}
+    <p class="text-lg md:text-2xl text-gray-100 mb-8 drop-shadow-lg">
+      {{ banner.subtitle }}
+    </p>
+  {% endif %}
+  <a href="{% url 'book' %}" class="bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-700 text-white px-8 py-4 rounded-full font-bold shadow-lg hover:scale-105 transform transition">
+    {{ banner.button_text }}
+  </a>
+</div>
+
+  <!-- Optional Animated Circles -->
+  <div class="absolute -bottom-32 -left-32 w-72 h-72 bg-pink-500 rounded-full opacity-20 animate-pulse"></div>
+  <div class="absolute -top-32 -right-32 w-72 h-72 bg-purple-500 rounded-full opacity-20 animate-pulse"></div>
+</section>
+    {% endif %}
+  {% endfor %}
+{% else %}
+  <!-- Fallback Hero Section if no banner exists -->
+  <section class="relative h-screen flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0">
+      <img src="https://images.unsplash.com/photo-1605902711622-cfb43c4431d6?auto=format&fit=crop&w=1950&q=80" 
+           alt="Default Banner" 
+           class="w-full h-full object-cover brightness-75">
+    </div>
+    <div class="relative z-10 text-center px-6">
+      <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-4 drop-shadow-lg">Make Your Wedding Unforgettable</h1>
+      <p class="text-lg md:text-2xl text-gray-200 mb-8 drop-shadow-md">Plan the perfect day with our expert event management services.</p>
+      <a href="{% url 'book' %}" class="bg-indigo-600 text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-indigo-500 transition">Book Your Event</a>
+    </div>
+  </section>
+{% endif %}
+
+<!-- Services / Events Section with Image Cards -->
+<section id="services" class="py-20 relative z-10">
+  <div class="max-w-7xl mx-auto text-center">
+    <h2 class="text-5xl font-bold mb-12 text-white">Our Event Services</h2>
+    
+    <div class="grid md:grid-cols-3 gap-8">
+      {% for s in service %}
+      <div class="relative rounded-3xl overflow-hidden shadow-xl hover:scale-105 transform transition duration-500">
+        {% if s.image %}
+        <img src="{{ s.image.url }}" alt="{{ s.name }}" class="w-full h-80 object-cover">
+        {% else %}
+        <img src="https://via.placeholder.com/800x500?text={{ s.name }}" alt="{{ s.name }}" class="w-full h-80 object-cover">
+        {% endif %}
+        <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <h3 class="text-2xl font-bold text-white">{{ s.name }}</h3>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="bg-gray-800 py-20 relative z-10">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
+    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80" alt="Event" class="rounded-3xl shadow-2xl md:w-1/2 hover:scale-105 transform transition duration-500">
+    <div class="md:w-1/2">
+      <h2 class="text-5xl font-bold mb-4 text-white">About Eventify</h2>
+      <p class="text-gray-300 mb-4">We are your premier event booking platform, delivering unforgettable experiences for every occasion. From concept to execution, we handle it all with style and elegance.</p>
+      <a href="{% url 'book' %}" class="bg-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-indigo-500 transition">Book Now</a>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-20 relative z-10">
+  <div class="max-w-7xl mx-auto text-center">
+    <h2 class="text-5xl font-bold mb-12 text-white">Client Testimonials</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="glass-card p-8 rounded-3xl shadow-xl hover:scale-105 transform transition duration-500 bg-white/10 backdrop-blur-md border border-white/20">
+        <p class="text-gray-200 mb-4">"Eventify made our wedding perfect! Truly magical experience."</p>
+        <h4 class="font-bold text-indigo-400">- Priya & Rahul</h4>
+      </div>
+      <div class="glass-card p-8 rounded-3xl shadow-xl hover:scale-105 transform transition duration-500 bg-white/10 backdrop-blur-md border border-white/20">
+        <p class="text-gray-200 mb-4">"Professional and reliable. Our corporate event went off flawlessly."</p>
+        <h4 class="font-bold text-purple-400">- TechCorp</h4>
+      </div>
+      <div class="glass-card p-8 rounded-3xl shadow-xl hover:scale-105 transform transition duration-500 bg-white/10 backdrop-blur-md border border-white/20">
+        <p class="text-gray-200 mb-4">"Best birthday planning ever! Everything was perfect."</p>
+        <h4 class="font-bold text-pink-400">- Aakash</h4>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<section id="book" class="bg-indigo-600 py-20 text-center text-white">
+  <h2 class="text-5xl font-bold mb-4">Ready to Plan Your Event?</h2>
+  <p class="mb-8">Book today and make your event an unforgettable memory.</p>
+  <a href="{% url 'contact' %}" class="bg-white text-indigo-700 px-8 py-4 rounded-full font-bold shadow-lg hover:scale-105 transform transition">Book Now</a>
+</section>
+
+{% endblock %}

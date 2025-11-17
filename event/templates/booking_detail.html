@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Booking {{ booking.pk }} Details | Eventify{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto my-14">
+    <div class="bg-gray-900 rounded-xl shadow-2xl border border-gray-800 px-8 py-10">
+        <h2 class="text-3xl font-extrabold mb-7 text-center text-gradient bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent">
+            Booking Details
+        </h2>
+        <div class="mb-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <div class="font-bold text-pink-400 text-lg">Invoice #</div>
+                    <div class="font-bold text-pink-200 text-xl mb-2">BK{{ booking.pk|stringformat:"05d" }}</div>
+                </div>
+                <div>
+                    <div class="font-semibold text-indigo-400">Date</div>
+                    <div class="text-gray-300">{{ booking.event_date }}</div>
+                </div>
+                <div>
+                    <div class="font-semibold text-indigo-400">Time</div>
+                    <div class="text-gray-300">{{ booking.event_time }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="mb-6">
+            <div class="font-bold text-indigo-400">Event:</div>
+            <div class="text-lg text-gray-100 mb-2">{{ booking.service_type.name }}</div>
+            <div class="font-bold text-pink-400">Venue:</div>
+            <div class="text-gray-200 mb-2">{{ booking.venue }}</div>
+            <div class="font-bold text-purple-400">Customer:</div>
+            <div class="text-gray-200 mb-2">{{ booking.customer_name }}</div>
+            <div class="font-bold text-purple-400">Contact:</div>
+            <div class="text-gray-200 mb-2">{{ booking.phone }}</div>
+            {% if booking.secondary_phone %}
+                <div class="text-gray-400 mb-2">Secondary: {{ booking.secondary_phone }}</div>
+            {% endif %}
+        </div>
+        <div class="mb-4">
+            <div class="font-bold text-pink-300">Budget:</div>
+            <div class="text-2xl text-pink-500 font-extrabold">₹{{ booking.service_type.budget|floatformat:2 }}</div>
+        </div>
+        <div class="mb-4">
+            <div class="font-bold text-purple-300">Status:</div>
+            {% if booking.status == "confirmed" %}
+                <span class="inline-block px-5 py-1 rounded-full bg-green-700 text-green-200 font-bold text-lg">Confirmed</span>
+            {% elif booking.status == "pending" %}
+                <span class="inline-block px-5 py-1 rounded-full bg-yellow-700 text-yellow-100 font-bold text-lg">Pending</span>
+            {% else %}
+                <span class="inline-block px-5 py-1 rounded-full bg-gray-500 text-white font-bold text-lg">{{ booking.status|capfirst }}</span>
+            {% endif %}
+        </div>
+        {% if booking.notes %}
+        <div class="mt-6">
+            <div class="font-bold text-indigo-300 mb-2">Notes:</div>
+            <div class="bg-gray-800 rounded p-4 text-gray-100">{{ booking.notes }}</div>
+        </div>
+        {% endif %}
+        <div class="mt-8">
+            <a href="{% url 'booking_view' %}"
+               class="inline-block px-6 py-2 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold shadow hover:scale-105 transition">
+                Back to Bookings
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

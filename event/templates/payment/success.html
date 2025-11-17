@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Payment Success{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto mt-16 p-10 bg-gray-900 text-white rounded-2xl shadow-xl">
+
+    <h2 class="text-4xl font-extrabold text-green-400 text-center mb-8">
+        Payment Successful!
+    </h2>
+
+    <div class="bg-gray-800 p-6 rounded-xl mb-6">
+        <p class="text-xl font-bold text-indigo-300">
+            Invoice Number: <span class="text-white">{{ invoice_no }}</span>
+        </p>
+        <p class="text-lg mt-3">Customer: {{ customer_name }}</p>
+        <p>Phone: {{ phone }}</p>
+
+        {% if secondary_phone %}
+        <p>Secondary Phone: {{ secondary_phone }}</p>
+        {% endif %}
+
+        <p>Venue: {{ venue }}</p>
+
+        <p class="text-lg font-bold mt-3 text-green-300">
+            Total Paid: ₹{{ total_amount }}
+        </p>
+
+        <p class="text-gray-300 mt-3">Payment Type: {{ payment_type }}</p>
+        <p class="text-gray-300">Payment Mode: {{ payment_mode }}</p>
+
+        <p class="text-gray-300 mt-3">
+            Razorpay Payment ID: <span class="text-white">{{ razorpay_payment_id }}</span>
+        </p>
+    </div>
+
+    <h3 class="text-2xl font-bold text-pink-400 mb-4">Booking Details</h3>
+
+    {% for s in sections %}
+    <div class="bg-gray-800 p-4 rounded-lg mb-3">
+        <p class="font-bold text-purple-300">{{ s.service }} ({{ s.service_type }})</p>
+        <p>Date: {{ s.date }} | Time: {{ s.time }}</p>
+        <p>Budget: ₹{{ s.budget }}</p>
+        {% if s.notes %}
+        <p class="text-gray-400 italic">{{ s.notes }}</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

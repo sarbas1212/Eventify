@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Eventify{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans">
+
+<!-- Unique Glassmorphic Navbar -->
+<nav class="fixed top-0 w-full z-50 bg-white/10 backdrop-blur-xl border-b border-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 shadow-lg">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    
+    <!-- Logo -->
+    <a href="{% url 'home' %}" class="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:scale-110 transform transition duration-500">Eventify</a>
+
+    <!-- Desktop Menu -->
+    <div class="hidden md:flex space-x-8 text-white font-semibold">
+      <a href="{% url 'home' %}" class="relative group hover:text-pink-400 transition">
+        Home
+        <span class="absolute left-0 -bottom-1 w-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 group-hover:w-full transition-all duration-500 rounded-full"></span>
+      </a>
+      <a href="{% url 'services' %}" class="relative group hover:text-pink-400 transition">
+        Events
+        <span class="absolute left-0 -bottom-1 w-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 group-hover:w-full transition-all duration-500 rounded-full"></span>
+      </a>
+      <a href="{% url 'about' %}" class="relative group hover:text-pink-400 transition">
+        About
+        <span class="absolute left-0 -bottom-1 w-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 group-hover:w-full transition-all duration-500 rounded-full"></span>
+      </a>
+      <a href="{% url 'contact' %}" class="relative group hover:text-pink-400 transition">
+        Contact
+        <span class="absolute left-0 -bottom-1 w-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 group-hover:w-full transition-all duration-500 rounded-full"></span>
+      </a>
+      <a href="{% url 'booking_view' %}" class="relative group hover:text-pink-400 transition">
+       Bookings
+        <span class="absolute left-0 -bottom-1 w-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 group-hover:w-full transition-all duration-500 rounded-full"></span>
+      </a>
+      <a href="{% url 'book' %}" class="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 px-5 py-2 rounded-full font-semibold hover:scale-105 transform transition duration-300">Book Now</a>
+
+      {% if request.user.is_authenticated %}
+      <a href="{% url 'logout' %}" class="bg-white text-purple-600 px-5 py-2 rounded-full font-semibold hover:scale-105 transform transition duration-300">
+        Logout
+      </a>
+      {% else %}
+      <a href="{% url 'login' %}" class="bg-white text-purple-600 px-5 py-2 rounded-full font-semibold hover:scale-105 transform transition duration-300">
+        Login
+      </a>
+      {% endif %}
+    </div>
+
+    <!-- Mobile Menu Toggle -->
+    <div class="md:hidden flex items-center">
+      <label for="menu-toggle" class="cursor-pointer">
+        <i class="fas fa-bars text-white text-2xl"></i>
+      </label>
+      <input type="checkbox" id="menu-toggle" class="hidden peer" />
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div class="md:hidden">
+    <div class="hidden peer-checked:flex flex-col bg-white/10 backdrop-blur-xl border-t border-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
+      <a href="{% url 'home' %}" class="block px-6 py-3 hover:bg-indigo-500/20 text-white transition">Home</a>
+      <a href="{% url 'services' %}" class="block px-6 py-3 hover:bg-indigo-500/20 text-white transition">Events</a>
+      <a href="{% url 'about' %}" class="block px-6 py-3 hover:bg-indigo-500/20 text-white transition">About</a>
+      <a href="{% url 'contact' %}" class="block px-6 py-3 hover:bg-indigo-500/20 text-white transition">Contact</a>
+      <a href="{% url 'booking_view' %}" class="block px-6 py-3 hover:bg-indigo-500/20 text-white transition">Bookings</a>
+      <a href="{% url 'book' %}" class="block px-6 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white text-center rounded-full my-2 mx-4 hover:scale-105 transform transition">Book Now</a>
+      <a href="{% url 'login' %}" class="block px-6 py-3 bg-white text-purple-600 text-center rounded-full my-2 mx-4 hover:scale-105 transform transition">Login</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main class="pt-24">
+  {% block content %}
+  {% endblock %}
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 py-8 mt-16">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
+    <p>&copy; 2025 Eventify. All Rights Reserved.</p>
+    <div class="space-x-4 mt-4 md:mt-0">
+      <a href="#" class="hover:text-white"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" class="hover:text-white"><i class="fab fa-twitter"></i></a>
+      <a href="#" class="hover:text-white"><i class="fab fa-instagram"></i></a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

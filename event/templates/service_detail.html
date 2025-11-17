@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}{{ service_type.name }} | Eventify{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-gray-900 text-gray-100 py-24 px-6">
+  <div class="max-w-5xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden p-8 md:p-12">
+
+    <!-- Image (just image, no badge here) -->
+    <div class="w-full h-80 rounded-2xl overflow-hidden mb-8">
+      <img src="{{ service_type.image.url }}" alt="{{ service_type.name }}"
+           class="w-full h-full object-cover transform hover:scale-105 transition duration-700">
+    </div>
+
+    <!-- Title + Trending badge (separate from image) -->
+    <div class="flex items-center justify-center gap-3 mb-6">
+      <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
+        {{ service_type.name }}
+      </h1>
+
+      {% if service_type.trending %}
+      <span class="bg-yellow-400 text-black text-sm font-semibold px-3 py-1 rounded-full shadow">
+        🔥 Trending
+      </span>
+      {% endif %}
+    </div>
+
+    <!-- Description -->
+    <p class="text-gray-200 text-lg leading-relaxed text-justify mb-8">
+      {{ service_type.description }}
+    </p>
+
+    <!-- Budget -->
+    {% if service_type.budget %}
+    <div class="text-center mb-8">
+      <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-lime-400">
+        Budget: ₹{{ service_type.budget }}
+      </span>
+    </div>
+    {% endif %}
+
+    <!-- Buttons -->
+    <div class="flex justify-center gap-6 mb-12">
+      <a href="{% url 'book' %}"
+         class="px-8 py-3 text-lg font-semibold text-white bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 rounded-full shadow-lg hover:scale-105 transform transition duration-300">
+        Book Now
+      </a>
+
+      <!-- Preview Button -->
+      <label for="main-preview"
+             class="cursor-pointer px-8 py-3 text-lg font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full shadow-lg hover:scale-105 transform transition duration-300">
+        Preview
+      </label>
+    </div>
+
+    <!-- Main Preview Modal -->
+    <input type="checkbox" id="main-preview" class="hidden peer">
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden peer-checked:flex items-center justify-center z-50">
+      <label for="main-preview" class="absolute inset-0 cursor-pointer"></label>
+      <div class="relative max-w-3xl w-full mx-auto">
+        <img src="{{ service_type.image.url }}" alt="{{ service_type.name }}"
+             class="rounded-2xl shadow-2xl border border-white/20 w-full object-contain">
+        <label for="main-preview"
+               class="absolute top-4 right-4 bg-white/20 hover:bg-white/40 text-white rounded-full px-3 py-1 text-sm cursor-pointer transition">
+          ✕
+        </label>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-white/20 my-8"></div>
+
+    <!-- Other Models Section -->
+    <h2 class="text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 mb-8">
+      Other Models in {{ service_type.service.name }}
+    </h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for other in service_type.service.types.all %}
+        {% if other.id != service_type.id %}
+        <div class="relative bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl overflow-hidden shadow-lg hover:scale-[1.02] transform transition duration-500">
+          {% if other.trending %}
+          <span class="absolute top-3 left-3 bg-yellow-400 text-black text-xs font-semibold px-2 py-1 rounded shadow">🔥 Trending</span>
+          {% endif %}
+          <img src="{{ other.image.url }}" alt="{{ other.name }}" class="h-48 w-full object-cover hover:scale-110 transition duration-700">
+          <div class="p-5">
+            <h3 class="text-xl font-semibold text-white mb-2">{{ other.name }}</h3>
+            <p class="text-gray-300 text-sm line-clamp-3 mb-3">{{ other.description }}</p>
+
+            {% if other.budget %}
+            <p class="text-sm font-semibold text-green-400 mb-4">Budget: ₹{{ other.budget }}</p>
+            {% endif %}
+
+            <div class="flex justify-between">
+              <a href="{% url 'service_detail' other.service.id other.id %}"
+                 class="text-sm font-semibold text-white bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 px-4 py-2 rounded-full hover:scale-105 transition">
+                View Details
+              </a>
+
+              <label for="preview-{{ other.id }}"
+                     class="cursor-pointer text-sm font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-500 px-4 py-2 rounded-full hover:scale-105 transition">
+                Preview
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image Preview Modal -->
+        <input type="checkbox" id="preview-{{ other.id }}" class="hidden peer">
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden peer-checked:flex items-center justify-center z-50">
+          <label for="preview-{{ other.id }}" class="absolute inset-0 cursor-pointer"></label>
+          <div class="relative max-w-3xl w-full mx-auto">
+            <img src="{{ other.image.url }}" alt="{{ other.name }}" class="rounded-2xl shadow-2xl border border-white/20 w-full object-contain">
+            <label for="preview-{{ other.id }}"
+                   class="absolute top-4 right-4 bg-white/20 hover:bg-white/40 text-white rounded-full px-3 py-1 text-sm cursor-pointer transition">
+              ✕
+            </label>
+          </div>
+        </div>
+        {% endif %}
+      {% empty %}
+      <p class="text-center text-gray-400 col-span-3">No other models available in this category.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
